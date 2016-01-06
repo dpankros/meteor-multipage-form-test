@@ -19,6 +19,7 @@
 </body>
 
 <template name="mpf">
+  {{> AlertCategory name='mpf'}}
   {{> MultiPageForm multipage=multipage}}
 </template>
 
@@ -52,8 +53,9 @@
 <template name="lastForm">
   <h2>Terms of Service Form</h2>
   {{#autoForm id="lastFormId" doc=doc.lastPage schema=schema}}
-    {{> afQuickField name='accept'}}
     {{> afQuickField name='fail'}}
+    {{> afQuickField name='server'}}
     {{> mpfButtons}}
   {{/autoForm}}
 </template>
+

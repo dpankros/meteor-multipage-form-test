@@ -1,16 +1,16 @@
-
-Meteor.startup(function(){
-  AutoForm.debug();
-})
+Meteor.startup(function() {
+    AutoForm.debug();
+  }
+)
 
 
 //note that this var is created in the page scope so it is not visible to other
 //pages as written
 var createAccountMP = new MultiPageForm({
-  //sets the first page that is shown
+    //sets the first page that is shown
     defaultPage: 'firstPage',
 
-  //definition for the first page
+    //definition for the first page
     firstPage: {
       template: 'firstForm', //blaze template name
       form: 'firstFormId', //autoform id
@@ -63,9 +63,9 @@ createAccountMP.addHooks({
     onError: onError,
     onNext: logOnly, //just so you can see the events fire
     onPrev: logOnly //just so you can see the events fire
-  //saveDocument: function()...  saves the document after each page submits.
-  //only override saveDocument if you don't like the format of the document with
-  //a property for each page
+    //saveDocument: function()...  saves the document after each page submits.
+    //only override saveDocument if you don't like the format of the document with
+    //a property for each page
   }
 );
 
@@ -73,23 +73,58 @@ createAccountMP.addHooks({
 function onCreateAccount(page, doc, mp) {
   console.log('onCreateAccount', page, doc);
   //Account created, probably give some notice
-  console.log(JSON.stringify(doc));
+
+  //AlertCategory.getOrCreate('mpf').clearAll();
+  AlertCategory.getOrCreate('mpf').show('success', 'Form Submitted Successfully', undefined, 20*1000);
 }
 
 
 function onFormSubmit(page, doc, mp) {
   console.log('onFormSubmit', page, doc);
 
-  if (doc.lastPage && doc.lastPage.fail){
-    throw new MeteorError('Failure', 'Manually Triggered Error');
+  if (!doc.lastPage) {
+    throw new Meteor.Error('Invalid Data', 'doc does not contain a property named lastPage');
   }
-  //actually DO something and throw an error if it doesn't work
-  //this.done();
+
+  var that = this;
+  if (doc.lastPage.server) {
+    if (doc.lastPage.fail) {
+      Meteor.call('fail', function(e, r) {
+          if (e) {
+            console.error(e.message);
+            that.done(e);
+            return;
+          }
+          console.log(r);
+          that.done();
+        }
+      )
+    } else {
+      Meteor.call('succeed', function(e, r) {
+          if (e) {
+            console.error(e.message);
+            that.done(e);
+            return;
+          }
+          console.log(r);
+          that.done();
+        }
+      )
+    }
+  } else {
+    //local
+    if (doc.lastPage.fail) {
+      this.done('Manually triggered error');
+    }
+  }
 }
 
 
 function onError(page, doc, mp, e) {
-  console.error(e, page, doc);
+  console.log('onError', e, page, doc);
+
+  const TIMEOUT = 20*1000; //10 seconds in ms
+  AlertCategory.getOrCreate('mpf').show('danger', e, undefined, TIMEOUT);
 }
 
 function logOnly(page, doc, mp) {

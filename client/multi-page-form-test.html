@@ -1,0 +1,59 @@
+<head>
+  <title>MPF Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-12">
+      <h1>Welcome to MPF!</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      {{>mpf}}
+    </div>
+  </div>
+</div>
+</body>
+
+<template name="mpf">
+  {{> MultiPageForm multipage=multipage}}
+</template>
+
+<template name="firstForm">
+  <h2>First Form</h2>
+  {{!--note that a quick form does not have the prev buttons that the mpfButtons template provides --}}
+  {{#autoForm id="firstFormId" doc=doc.firstPage schema=schema}}
+    {{> afQuickField name='first'}}
+    {{> afQuickField name='accountType'}}
+    {{> mpfButtons}}
+  {{/autoForm}}
+</template>
+
+<template name="form1a">
+  <h2>Tier 1 Form</h2>
+  {{#autoForm id="form1aId" doc=doc.secondAPage schema=schema}}
+    {{> afQuickField name='something'}}
+    {{> mpfButtons}}
+  {{/autoForm}}
+</template>
+
+<template name="form1b">
+  <h2>Tier 2 Form</h2>
+  {{#autoForm id="form1bId" doc=doc.secondBPage schema=schema}}
+    {{> afQuickField name='somethingElse'}}
+    {{> mpfButtons}}
+  {{/autoForm}}
+</template>
+
+
+<template name="lastForm">
+  <h2>Terms of Service Form</h2>
+  {{#autoForm id="lastFormId" doc=doc.lastPage schema=schema}}
+    {{> afQuickField name='accept'}}
+    {{> afQuickField name='fail'}}
+    {{> mpfButtons}}
+  {{/autoForm}}
+</template>
